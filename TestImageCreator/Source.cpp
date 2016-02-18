@@ -10,15 +10,15 @@ void img_resize(cv::Mat& src, cv::Mat& dst, int new_width, int new_height);
 void rotate(cv::Mat& src, double angle, cv::Mat& dst);
 void rot90(cv::Mat &matImage, int rotflag);
 std::string NameBeforeExt(std::string const& s);
-void RotatedImages(string destFoldPath, cv::Mat Im);
-void MirrorEffects(string destFoldPath, cv::Mat Im);
-void SaltAndPepperNoise(string destFoldPath, cv::Mat Im);
-void GaussianBluring(string destFoldPath, cv::Mat Im);
-void ContrastHL(string destFoldPath, cv::Mat Im);
-void ScalesWH(string destFoldPath, cv::Mat Im);
-void TextAdd(string destFoldPath, cv::Mat Im);
-void CropIm(string destFoldPath, cv::Mat Im, double s);
-void JpegComp(string destFoldPath, cv::Mat Im, const int JPEG_QUALITY);
+void RotatedImages(std::string destFoldPath, cv::Mat Im);
+void MirrorEffects(std::string destFoldPath, cv::Mat Im);
+void SaltAndPepperNoise(std::string destFoldPath, cv::Mat Im);
+void GaussianBluring(std::string destFoldPath, cv::Mat Im);
+void ContrastHL(std::string destFoldPath, cv::Mat Im);
+void ScalesWH(std::string destFoldPath, cv::Mat Im);
+void TextAdd(std::string destFoldPath, cv::Mat Im);
+void CropIm(std::string destFoldPath, cv::Mat Im, double s);
+void JpegComp(std::string destFoldPath, cv::Mat Im, const int JPEG_QUALITY);
 
 cv::RNG rng(0xFFFFFFFF);
 
@@ -26,7 +26,7 @@ int main(int argc, char** argv)
 {
 	std::string folderPath = argv[1];
 	std::string destMainFolder = argv[2];
-	vector<string> fileList;
+	std::vector<std::string> fileList;
 
 	GET_DirectoryImages(folderPath.c_str(), fileList);
 
@@ -35,9 +35,9 @@ int main(int argc, char** argv)
 	#pragma omp parallel for
 	for (int i = 0; i < fileList.size(); i++)
 	{
-		string fileName = NameBeforeExt(fileList[i]);
-		string filePath = folderPath + "\\" + fileList[i];
-		string destFoldPath = destMainFolder + "\\" + fileName;
+		std::string fileName = NameBeforeExt(fileList[i]);
+		std::string filePath = folderPath + "\\" + fileList[i];
+		std::string destFoldPath = destMainFolder + "\\" + fileName;
 		PathControl(destFoldPath);
 		destFoldPath += "\\" + fileName;
 		cv::Mat Im = cv::imread(filePath, cv::IMREAD_COLOR);
@@ -98,7 +98,7 @@ void rot90(cv::Mat &matImage, int rotflag){
 		flip(matImage, matImage, -1);    //flip(-1)=180          
 	}
 	else if (rotflag != 0){ //if not 0,1,2,3:
-		cout << "Unknown rotation flag(" << rotflag << ")" << endl;
+		std::cout << "Unknown rotation flag(" << rotflag << ")" << std::endl;
 	}
 }
 
@@ -124,7 +124,7 @@ std::string NameBeforeExt(std::string const& s)
 }
 
 
-void RotatedImages(string destFoldPath, cv::Mat Im)
+void RotatedImages(std::string destFoldPath, cv::Mat Im)
 {
 	cv::Mat R90, L90, R180;
 	R90 = Im.clone();
@@ -138,7 +138,7 @@ void RotatedImages(string destFoldPath, cv::Mat Im)
 	cv::imwrite(destFoldPath + "_L90.jpg", L90);
 }
 
-void MirrorEffects(string destFoldPath, cv::Mat Im)
+void MirrorEffects(std::string destFoldPath, cv::Mat Im)
 {
 	cv::Mat mirrorV, mirrorH;
 	//cv::Mat mirrorV, mirrorH, mirrorB;
@@ -150,7 +150,7 @@ void MirrorEffects(string destFoldPath, cv::Mat Im)
 	//cv::imwrite(destFoldPath + "_mirrorB.jpg", mirrorB);
 }
 
-void SaltAndPepperNoise(string destFoldPath, cv::Mat Im)
+void SaltAndPepperNoise(std::string destFoldPath, cv::Mat Im)
 {
 	cv::Mat saltpepper_noise = cv::Mat::zeros(Im.rows, Im.cols, CV_8U);
 	randu(saltpepper_noise, 0, 255);
@@ -171,7 +171,7 @@ void SaltAndPepperNoise(string destFoldPath, cv::Mat Im)
 	cv::imwrite(destFoldPath + "_saltpepper.jpg", saltpepper_img);
 }
 
-void GaussianBluring(string destFoldPath, cv::Mat Im)
+void GaussianBluring(std::string destFoldPath, cv::Mat Im)
 {
 	cv::Mat GBlur, GBlur2, GBlur3;
 	cv::GaussianBlur(Im, GBlur, cv::Size(3, 3), 2);
@@ -182,7 +182,7 @@ void GaussianBluring(string destFoldPath, cv::Mat Im)
 	cv::imwrite(destFoldPath + "_GBlur3.jpg", GBlur3);
 }
 
-void ContrastHL(string destFoldPath, cv::Mat Im)
+void ContrastHL(std::string destFoldPath, cv::Mat Im)
 {
 	cv::Mat imgH;
 	Im.convertTo(imgH, -1, 0.5, 0); //increase the contrast (double)
@@ -194,7 +194,7 @@ void ContrastHL(string destFoldPath, cv::Mat Im)
 	cv::imwrite(destFoldPath + "_LCont.jpg", imgL);
 }
 
-void ScalesWH(string destFoldPath, cv::Mat Im)
+void ScalesWH(std::string destFoldPath, cv::Mat Im)
 {
 	cv::Mat Res = cv::Mat(cv::Size(Im.cols * 1.25, Im.rows), CV_8UC3);
 	cv::resize(Im, Res, Res.size(), 0, 0, CV_INTER_LINEAR);
@@ -206,7 +206,7 @@ void ScalesWH(string destFoldPath, cv::Mat Im)
 	cv::imwrite(destFoldPath + "_ScaleH.jpg", Res2);
 }
 
-void TextAdd(string destFoldPath, cv::Mat Im)
+void TextAdd(std::string destFoldPath, cv::Mat Im)
 {
 	cv::Mat textIm = Im.clone();
 
@@ -224,19 +224,16 @@ void TextAdd(string destFoldPath, cv::Mat Im)
 	cv::imwrite(destFoldPath + "_Text.jpg", textIm);
 }
 
-void CropIm(string destFoldPath, cv::Mat Im, double s)
+void CropIm(std::string destFoldPath, cv::Mat Im, double s)
 {
 	int w = Im.rows;
 	int h = Im.cols;
 
 	int wStart;
 	int hStart;
-
-	
 	
 	wStart = rng.uniform(0.0, w*(1-s));
 	hStart = rng.uniform(0.0, h*(1-s));
-
 
 	cv::Rect myROI(hStart, wStart, h*s, w*s);
 
@@ -244,9 +241,9 @@ void CropIm(string destFoldPath, cv::Mat Im, double s)
 	cv::imwrite(destFoldPath + "_crop" + int2string(int(s * 100)) + ".jpg", croppedImage);
 }
 
-void JpegComp(string destFoldPath, cv::Mat Im, const int JPEG_QUALITY)
+void JpegComp(std::string destFoldPath, cv::Mat Im, const int JPEG_QUALITY)
 {
-	vector<int> params;
+	std::vector<int> params;
 	params.push_back(CV_IMWRITE_JPEG_QUALITY);
 	params.push_back(JPEG_QUALITY);
 	cv::imwrite(destFoldPath + "_J_Comp" + int2string(JPEG_QUALITY) + ".jpg", Im, params);
